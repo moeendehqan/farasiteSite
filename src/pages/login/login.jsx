@@ -11,11 +11,10 @@ const Login = () => {
   const [mobile, setMobile] = useState();
   const [encrypted_response, setencrypted_response] = useState();
   const [captcha, setCaptcha] = useState();
-  const [postData, setPost] = useState({ mobile:"", captcha:"", encrypted_reasponse:encrypted_response });
+  const [postData, setPost] = useState({ mobile:"", captcha:"", encrypted_reasponse:'' });
   const [data, setData] = useState(image, mobile, captcha, encrypted_response);
   const [isSubmit, , setIsSubmit] = useState(false);
   // const [postData, setPostData] = useState(image, mobile, captcha);
-  console.log("run", OnRun);
   // const userData = usePostFetchApi(
   //   OnRun + "/authentication/mobileverification",
   //   post
@@ -30,9 +29,9 @@ const Login = () => {
     const getCaptcha = async () => {
       axios
         .get(OnRun + "/authentication/captcha")
-        .then((Response) => {
-          setImage(Response.data.image), console.log(Response.data);
-          setencrypted_response(Response.data.encrypted_response);
+        .then((response) => {
+          setImage(response.data.image);
+          setPost({...postData, encrypted_response:response.data.encrypted_response});
         })
         .catch((err) => {
           console.log(err);
@@ -40,23 +39,16 @@ const Login = () => {
     };
     getCaptcha();
   }, []);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(OnRun + "/authentication/mobileverification", postData);
-      console.log("Post created:", response.data.encrypted_response);
 
-    } catch (error) {
-      console.error("Error creating post:", error);
-    }
-    console.log(
-      "postdata",postData
-    );
-    // {
-    //   mobile == mobile && captcha == captcha
-    //     ? (isSubmit(true), console.log("post data", post),userData)
-    //     : isSubmit(false);
-    // }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios.post(OnRun + "/authentication/mobileverification", postData)
+    .then(response=>{
+      console.log(response.data)
+    })
+    .catch(error=>{
+      console.log(error)
+    })
   };
   const handleChange = (e) => {
     setPost({ ...postData, [e.target.name]: [e.target.value] });
